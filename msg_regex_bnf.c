@@ -65,7 +65,7 @@
 
 //  user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
 //                  ; any octet except NUL, CR, LF, " " and "@"
-#define user "[^ @]+"
+#define user "([^ @]+)"
 
 //  nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
 #define nickname "[" letter special "][-" letter digit special "]*"
@@ -95,7 +95,7 @@
 #define host "(" hostname "|" hostaddr ")"
 
 //    prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
-#define prefix "((" servername ")|(" nickname ")(" "(!("user"))?" "@(" host "))?)"
+#define prefix "((" servername ")|(" nickname ")(" "(!"user")?" "@" host ")?)"
 
 //    command    =  1*letter / 3digit
 #define command "([" letter "]+|[" digit "]{3})"
