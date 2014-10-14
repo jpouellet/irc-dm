@@ -175,7 +175,7 @@ main(int argc, char *argv[])
 	msg_parser_init();
 
 	if (argc != 2) {
-		fprintf(stderr, "Usage: %s string\n", argv[0]);
+		fprintf(stderr, "Usage: %s string\n", getprogname());
 		return 1;
 	}
 
