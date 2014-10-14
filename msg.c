@@ -5,8 +5,11 @@
 #include <string.h>
 #include <stdio.h>
 
-#define PAT "^:$"
-#define PAT_NSUB (3)
+static const char msg_regex[] =
+#include "msg_regex.h"
+;
+
+#define PAT_NSUB (24)
 #define PAT_NPMATCH (PAT_NSUB + 1)
 
 struct msg {
@@ -24,7 +27,7 @@ void msg_dump(struct msg *);
 void
 msg_parser_init(void)
 {
-	assert(regcomp(&preg, PAT, REG_EXTENDED) == 0);
+	assert(regcomp(&preg, msg_regex, REG_EXTENDED) == 0);
 printf("nsub %zu\n", preg.re_nsub);
 	assert(preg.re_nsub == PAT_NSUB);
 }
@@ -55,8 +58,8 @@ msg_parse(const char *line)
 
 	msg->line = strdup(line);
 	for (i = 0; i < PAT_NPMATCH; i++)
-		printf("[%lld:%lld] %s\n",
-		    pmatch[i].rm_so, pmatch[i].rm_eo,
+		printf("%2d [%lld:%lld] %s\n",
+		    i, pmatch[i].rm_so, pmatch[i].rm_eo,
 		    strndup(&line[pmatch[i].rm_so],
 		        pmatch[i].rm_eo - pmatch[i].rm_so));
 
