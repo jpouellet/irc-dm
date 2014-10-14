@@ -1,24 +1,34 @@
-CFLAGS=-Wall -Wextra -std=c89 -pedantic
+CFLAGS=-Wall -Wextra -std=c89 -pedantic -Wno-unused-parameter
 
 .PHONY: clean regex regex-c
 
-msg: msg.c
+event: LDFLAGS=-levent
+ssl: LDFLAGS=-levent -lssl # -levent_openssl
+msg: CFLAGS+=-DTEST
+
+all: ssl event msg
+
+ssl:
+
+event:
+
+msg:
 
 msg.c: msg_regex.h
 	@touch msg.c
 
 regex:
-	@cc msg_regex_bnf.c -o msg_regex_bnf
+	@$(CC) msg_regex_bnf.c -o msg_regex_bnf
 	@./msg_regex_bnf
 	@rm -f msg_regex_bnf
 
 regex-c:
-	@cc msg_regex_bnf.c -DESCAPE -o msg_regex_bnf
+	@$(CC) msg_regex_bnf.c -DESCAPE -o msg_regex_bnf
 	@./msg_regex_bnf
 	@rm -f msg_regex_bnf
 
 msg_regex.h: msg_regex_bnf.c
-	cc -DJUST_PREPROCESS -E $< | tail -1 > $@
+	$(CPP) -DJUST_PREPROCESS $< | tail -1 > $@
 
 clean:
-	rm -f msg_regex.h msg
+	rm -f msg_regex.h msg event ssl
