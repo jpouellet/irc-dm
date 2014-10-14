@@ -1,4 +1,6 @@
 /*
+ * Adapted from https://tools.ietf.org/html/rfc2812#section-2.3.1
+
 2.3.1 Message format in Augmented BNF
 
    The protocol messages must be extracted from the contiguous stream of
@@ -52,11 +54,11 @@
 //                   ; "[", "]", "\", "`", "_", "^", "{", "|", "}"
 #define special "\\[\\]\\\\`_\\^\\{\\|\\}"
 
-//  hexdigit   =  digit / "A" / "B" / "C" / "D" / "E" / "F"
-#define hexdigit digit "A-F"
-
 //  digit      =  %x30-39                 ; 0-9
 #define digit "0-9"
+
+//  hexdigit   =  digit / "A" / "B" / "C" / "D" / "E" / "F"
+#define hexdigit digit "A-F"
 
 //  letter     =  %x41-5A / %x61-7A       ; A-Z / a-z
 #define letter "A-Za-z"
@@ -68,12 +70,12 @@
 //  nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
 #define nickname "[" letter special "][-" letter digit special "]*"
 
+//  ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
+#define ip4addr "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
+
 //  ip6addr    =  1*hexdigit 7( ":" 1*hexdigit )
 //  ip6addr    =/ "0:0:0:0:0:" ( "0" / "FFFF" ) ":" ip4addr
 #define ip6addr "(0:0:0:0:0:(0|FFFF):" ip4addr "|[" hexdigit "]+(:[" hexdigit "]+){7})"
-
-//  ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
-#define ip4addr "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
 
 //  hostaddr   =  ip4addr / ip6addr
 #define hostaddr "(" ip4addr "|" ip6addr ")"
@@ -86,26 +88,26 @@
 //  hostname   =  shortname *( "." shortname )
 #define hostname shortname "(\\." shortname ")*"
 
-//  host       =  hostname / hostaddr
-#define host "(" hostname "|" hostaddr ")"
-
 //  servername =  hostname
 #define servername hostname
 
-//    trailing   =  *( ":" / " " / nospcrlfcl )
-#define trailing "(:| |" nospcrlfcl ")*"
-
-//    middle     =  nospcrlfcl *( ":" / nospcrlfcl )
-#define middle nospcrlfcl "(:|" nospcrlfcl ")*"
+//  host       =  hostname / hostaddr
+#define host "(" hostname "|" hostaddr ")"
 
 //    nospcrlfcl =  %x01-09 / %x0B-0C / %x0E-1F / %x21-39 / %x3B-FF
 //                    ; any octet except NUL, CR, LF, " " and ":"
 #define nospcrlfcl "[^: ]"
 
+//    trailing   =  *( ":" / " " / nospcrlfcl )
+#define trailing "(.*)"
+
+//    middle     =  nospcrlfcl *( ":" / nospcrlfcl )
+#define middle nospcrlfcl "(:|" nospcrlfcl ")*"
+
 //    params     =  *14( SPACE middle ) [ SPACE ":" trailing ]
 //               =/ 14( SPACE middle ) [ SPACE [ ":" ] trailing ]
 #define params "("				\
-    "( " middle "){,14}( :" trailing ")?"	\
+    "( " middle "){0,14}( :" trailing ")?"	\
   "|"						\
     "( " middle "){14}( :?" trailing ")?"	\
   ")"
