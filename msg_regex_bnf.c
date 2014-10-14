@@ -100,7 +100,7 @@
 //    command    =  1*letter / 3digit
 #define command "([" letter "]+|[" digit "]{3})"
 
-#define params "(( [^: ][^ ]*)*)?"
+#define params "(( [^: ][^ ]*)+)?"
 
 #define trailing " :(.+)?"
 
