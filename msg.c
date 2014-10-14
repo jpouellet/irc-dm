@@ -5,38 +5,62 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "msg.h"
+
+/* Big regex built up in readable parts. */
 static const char msg_regex[] =
 #include "msg_regex.h"
 ;
 
+/* Don't forget to update the capture groups! */
 #define PAT_NSUB (18)
+
+/* Capture groups. */
+#define CG_PREFIX (2)
+#define CG_SERVER (3)
+#define CG_NICK (5)
+#define CG_USER (8)
+#define CG_HOST (9)
+#define CG_COMMAND (15)
+#define CG_PARAMS (16)
+#define CG_TRAILING (18)
+
 #define PAT_NPMATCH (PAT_NSUB + 1)
 
-struct msg {
-	char *line;
-};
-
-regex_t preg;
-regmatch_t pmatch[PAT_NPMATCH];
-
-void msg_parser_init(void);
-void msg_free(struct msg *);
-struct msg * msg_parse(const char *);
-void msg_dump(struct msg *);
+static regex_t preg;
+static regmatch_t pmatch[PAT_NPMATCH];
 
 void
 msg_parser_init(void)
 {
 	assert(regcomp(&preg, msg_regex, REG_EXTENDED) == 0);
-printf("nsub %zu\n", preg.re_nsub);
 	assert(preg.re_nsub == PAT_NSUB);
 }
 
 void
 msg_free(struct msg *msg)
 {
-	free(msg->line);
+	size_t i;
+
+	free(msg->raw);
+	free(msg->prefix);
+	free(msg->server);
+	free(msg->nick);
+	free(msg->user);
+	free(msg->host);
+	free(msg->command);
+	for (i = 0; i < msg->n_params; i++)
+		free(msg->params[i]);
+	free(msg->trailing);
 	free(msg);
+}
+
+char *
+msg_param(struct msg *msg, size_t param)
+{
+	if (param >= msg->n_params)
+		return NULL;
+	return msg->params[param];
 }
 
 struct msg *
@@ -56,7 +80,7 @@ msg_parse(const char *line)
 		return NULL;
 	}
 
-	msg->line = strdup(line);
+	msg->raw = strdup(line);
 	for (i = 0; i < PAT_NPMATCH; i++)
 		printf("%2d [%lld:%lld] %s\n",
 		    i, pmatch[i].rm_so, pmatch[i].rm_eo,
@@ -69,7 +93,7 @@ msg_parse(const char *line)
 void
 msg_dump(struct msg *msg)
 {
-	printf("[nsub %p | line=%s]\n", msg, msg->line);
+	printf("[nsub %p | line=%s]\n", msg, msg->raw);
 }
 
 int
