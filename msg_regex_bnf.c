@@ -121,17 +121,25 @@
 //    message    =  [ ":" prefix SPACE ] command [ params ] crlf
 #define message "^(:" prefix " )?" command "(" params ")?$"
 
+#ifdef TERMINAL
+#define TO_PRINT TERMINAL
+#else
+#define TO_PRINT message
+#endif
+
 #ifdef JUST_PREPROCESS
-message
+TO_PRINT
 #else
 int putchar(int);
+int puts(const char *);
 
 int
 main()
 {
-	const char msg[] = message;
+	const char msg[] = TO_PRINT;
 	const char *p;
 
+#ifdef ESCAPE
 	putchar('"');
 	for (p = msg; *p != '\0'; p++) {
 		switch (*p) {
@@ -150,7 +158,10 @@ main()
 	}
 	putchar('"');
 	putchar('\n');
+#else /* ESCAPE */
+	puts(msg);
+#endif /* !ESCAPE */
 
 	return 0;
 }
-#endif
+#endif /* !JUST_PREPROCESS */
