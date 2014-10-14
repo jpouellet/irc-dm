@@ -94,32 +94,17 @@
 //  host       =  hostname / hostaddr
 #define host "(" hostname "|" hostaddr ")"
 
-//    nospcrlfcl =  %x01-09 / %x0B-0C / %x0E-1F / %x21-39 / %x3B-FF
-//                    ; any octet except NUL, CR, LF, " " and ":"
-#define nospcrlfcl "[^: ]"
-
-//    trailing   =  *( ":" / " " / nospcrlfcl )
-#define trailing "(.*)"
-
-//    middle     =  nospcrlfcl *( ":" / nospcrlfcl )
-#define middle nospcrlfcl "(:|" nospcrlfcl ")*"
-
-//    params     =  *14( SPACE middle ) [ SPACE ":" trailing ]
-//               =/ 14( SPACE middle ) [ SPACE [ ":" ] trailing ]
-#define params "("				\
-    "( " middle "){0,14}( :" trailing ")?"	\
-  "|"						\
-    "( " middle "){14}( :?" trailing ")?"	\
-  ")"
+//    prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
+#define prefix "((" servername ")|(" nickname ")(" "(!("user"))?" "@(" host "))?)"
 
 //    command    =  1*letter / 3digit
 #define command "([" letter "]+|[" digit "]{3})"
 
-//    prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
-#define prefix "((" servername ")|(" nickname ")(" "(!("user"))?" "@(" host "))?)"
+#define params "(( [^: ][^ ]*)*)?"
 
-//    message    =  [ ":" prefix SPACE ] command [ params ] crlf
-#define message "^(:" prefix " )?" command "(" params ")?$"
+#define trailing " :(.+)?"
+
+#define message "^(:" prefix " )?" command params trailing "$"
 
 #ifdef TERMINAL
 #define TO_PRINT TERMINAL

@@ -9,7 +9,7 @@ static const char msg_regex[] =
 #include "msg_regex.h"
 ;
 
-#define PAT_NSUB (24)
+#define PAT_NSUB (19)
 #define PAT_NPMATCH (PAT_NSUB + 1)
 
 struct msg {
