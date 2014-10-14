@@ -100,11 +100,11 @@
 //    command    =  1*letter / 3digit
 #define command "([" letter "]+|[" digit "]{3})"
 
-#define params "(( [^: ][^ ]*)+)?"
+#define params "(([^: ][^ ]* )+)?"
 
-#define trailing " :(.+)?"
+#define trailing ":(.+)?"
 
-#define message "^(:" prefix " )?" command params trailing "$"
+#define message "^(:" prefix " )?" command " " params trailing "$"
 
 #ifdef TERMINAL
 #define TO_PRINT TERMINAL
