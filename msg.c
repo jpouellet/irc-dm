@@ -55,14 +55,6 @@ msg_free(struct msg *msg)
 	free(msg);
 }
 
-char *
-msg_param(struct msg *msg, size_t param)
-{
-	if (param >= msg->n_params)
-		return NULL;
-	return msg->params[param];
-}
-
 struct msg *
 msg_parse(const char *line)
 {
@@ -88,6 +80,14 @@ msg_parse(const char *line)
 		        pmatch[i].rm_eo - pmatch[i].rm_so));
 
 	return msg;
+}
+
+char *
+msg_param(const struct msg *msg, off_t param)
+{
+	if (param < 0 || (size_t)param >= msg->n_params)
+		return NULL;
+	return msg->params[param];
 }
 
 void
