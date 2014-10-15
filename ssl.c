@@ -35,6 +35,12 @@ ssl_ctx_new(const char *pkey, const char *cert_chain)
 	SSL_CTX_set_options(ctx, REJECTED_SSL_PROTOS |
 	    SSL_OP_TLSEXT_PADDING | SSL_OP_NO_COMPRESSION);
 
+	// XXX ressl_configure_ssl(ctx)
+
+	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, NULL);
+	SSL_CTX_set_verify(ctx, cert_chain, NULL);
+	/* SSL_CTX_set_verify_depth(...); */
+
 	return ctx;
 }
 
