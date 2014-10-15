@@ -21,8 +21,6 @@ get_ctx(const char *pkey, const char *cert_chain)
 
 	SSL_load_error_strings();
 	SSL_library_init();
-	if (!RAND_poll())
-		return NULL;
 
 	ctx = SSL_CTX_new(SSLv23_client_method());
 	if (ctx == NULL) {
