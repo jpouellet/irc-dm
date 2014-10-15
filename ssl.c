@@ -14,13 +14,17 @@
 	    SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | \
 	    SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1 )
 
-SSL_CTX *
-get_ctx(const char *pkey, const char *cert_chain)
+void
+ssl_init(void)
 {
-	SSL_CTX *ctx;
-
 	SSL_load_error_strings();
 	SSL_library_init();
+}
+
+SSL_CTX *
+ssl_ctx_new(const char *pkey, const char *cert_chain)
+{
+	SSL_CTX *ctx;
 
 	ctx = SSL_CTX_new(SSLv23_client_method());
 	if (ctx == NULL) {
