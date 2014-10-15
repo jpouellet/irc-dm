@@ -19,7 +19,7 @@ get_ctx(const char *pkey, const char *cert_chain)
 {
 	SSL_CTX *ctx;
 
-	SSL_load_error_strings()
+	SSL_load_error_strings();
 	SSL_library_init();
 	if (!RAND_poll())
 		return NULL;
