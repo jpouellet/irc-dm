@@ -45,7 +45,7 @@ ssl_ctx_new(const char *pkey, const char *cert_chain)
 }
 
 void
-shutdown_and_free(struct bufferevent *bev)
+bev_shutdown_and_free(struct bufferevent *bev)
 {
 	SSL *ctx;
 
