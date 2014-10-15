@@ -1,4 +1,5 @@
-CFLAGS=-Wall -Wextra -std=c89 -pedantic -Wno-unused-parameter
+CFLAGS=-Wall -Wextra -std=c89 -pedantic
+CFLAGS+=-Wno-unused-parameter -Wno-long-long
 
 .PHONY: clean regex regex-c
 
