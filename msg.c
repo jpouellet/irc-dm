@@ -90,12 +90,11 @@ msg_parse(const char *line)
 		return NULL;
 	}
 
-	msg = malloc(sizeof(struct msg));
+	msg = calloc(1, sizeof(*msg));
 	if (msg == NULL) {
 		warn("malloc failed");
 		return NULL;
 	}
-	memset(msg, 0, sizeof(struct msg));
 
 	if (extract(line, &pmatch[CG_ALL], &msg->raw) ||
 	    extract(line, &pmatch[CG_PREFIX], &msg->prefix) ||
