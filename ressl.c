@@ -15,38 +15,63 @@
 #include "bev_ressl.h"
 
 void
-read_cb(struct bufferevent *bev, void *ctx)
+stdin_read_cb(struct bufferevent *bev, void *ctx)
+{
+	struct bufferevent *ressl = ctx;
+	struct evbuffer *buf;
+	char *line;
+	size_t len;
+
+	buf = bufferevent_get_input(bev);
+	while ((line = evbuffer_readln(buf, NULL, EVBUFFER_EOL_CRLF)) != NULL) {
+		len = strlen(line) + 1;
+		line[len - 1] = '\n';
+		bufferevent_write(ressl, line, len);
+		free(line);
+	}
+}
+
+void
+ressl_read_cb(struct bufferevent *bev, void *ctx)
 {
 	struct evbuffer *buf;
 	char *line;
 
 	buf = bufferevent_get_input(bev);
-	line = evbuffer_readln(buf, NULL, EVBUFFER_EOL_CRLF);
-	if (line)
+	while ((line = evbuffer_readln(buf, NULL, EVBUFFER_EOL_CRLF)) != NULL) {
 		printf("%s\n", line);
-	else
-		printf("(empty)\n");
-	free(line);
+		free(line);
+	}
 }
 
 void
-event_cb(struct bufferevent *bev, short what, void *ctx)
+stdin_event_cb(struct bufferevent *bev, short what, void *ctx)
 {
-	if (what & BEV_EVENT_CONNECTED)
-		printf("connected\n");
+	if (what & BEV_EVENT_EOF) {
+		bufferevent_disable(bev, EV_READ);
+		event_base_loopbreak(bufferevent_get_base(bev));
+	}
 
-	if (what & BEV_EVENT_EOF)
-		errx(0, "EOF");
+	if (what & BEV_EVENT_ERROR) {
+		bufferevent_disable(bev, EV_READ);
+		warnx("bufferevent error for stdin");
+		event_base_loopbreak(bufferevent_get_base(bev));
+	}
+}
 
-	if (what & BEV_EVENT_TIMEOUT)
-		errx(1, "bufferevent timeout");
+void
+ressl_event_cb(struct bufferevent *bev, short what, void *ctx)
+{
+	if (what & BEV_EVENT_EOF) {
+		bufferevent_disable(bev, EV_READ);
+		event_base_loopbreak(bufferevent_get_base(bev));
+	}
 
-	if (what & BEV_EVENT_READING)
-		errx(1, "bufferevent error while reading");
-	if (what & BEV_EVENT_WRITING)
-		errx(1, "bufferevent error while writing");
-	if (what & BEV_EVENT_ERROR)
-		errx(1, "bufferevent error");
+	if (what & BEV_EVENT_ERROR) {
+		bufferevent_disable(bev, EV_READ);
+		warnx("bufferevent error for ressl");
+		event_base_loopbreak(bufferevent_get_base(bev));
+	}
 }
 
 void
@@ -62,7 +87,7 @@ main(int argc, char *argv[])
 	struct ressl_config *config;
 	struct ressl *ctx;
 	struct event_base *base;
-	struct bufferevent *bufev;
+	struct bufferevent *bev_stdin, *bev_ressl;
 	char *ca_file = NULL, *host, *port;
 	int ch;
 
@@ -115,14 +140,26 @@ main(int argc, char *argv[])
 	if (base == NULL)
 		errx(1, "event_base_new failed");
 
-	bufev = bufferevent_ressl_new(base, ctx, BEV_OPT_CLOSE_ON_FREE);
-	if (bufev == NULL)
+	bev_stdin = bufferevent_socket_new(base, STDIN_FILENO,
+	    BEV_OPT_CLOSE_ON_FREE | BEV_OPT_DEFER_CALLBACKS);
+	if (bev_stdin == NULL)
+		errx(1, "bufferevent_socket_new for stdin failed");
+
+	bev_ressl = bufferevent_ressl_new(base, ctx,
+	    BEV_OPT_CLOSE_ON_FREE | BEV_OPT_DEFER_CALLBACKS);
+	if (bev_ressl == NULL)
 		errx(1, "bufferevent_ressl_new failed");
 
-	bufferevent_setcb(bufev, &read_cb, NULL, event_cb, NULL);
+	bufferevent_setcb(bev_stdin, &stdin_read_cb, NULL, stdin_event_cb,
+	    bev_ressl);
+	bufferevent_setcb(bev_ressl, &ressl_read_cb, NULL, ressl_event_cb,
+	    NULL);
 
-	if (bufferevent_enable(bufev, EV_READ) == -1)
-		errx(1, "bufferevent_enable failed");
+	if (bufferevent_enable(bev_stdin, EV_READ) == -1)
+		errx(1, "bufferevent_enable for stdin failed");
+
+	if (bufferevent_enable(bev_ressl, EV_READ) == -1)
+		errx(1, "bufferevent_enable for ressl failed");
 
 	if (event_base_dispatch(base) == -1)
 		errx(1, "event_base_dispatch failed");
