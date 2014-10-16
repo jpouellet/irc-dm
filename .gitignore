@@ -1,3 +1,4 @@
+*.dSYM/
 bev_ressl.o
 config.mk
 event
