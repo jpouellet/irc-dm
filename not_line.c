@@ -8,8 +8,10 @@ main()
 	fflush(stdout);
 	sleep(1);
 	printf("\n");
+	fflush(stdout);
 	sleep(1);
-	printf("\n");
+	printf("line1\nline2\n");
+	fflush(stdout);
 	sleep(1);
 	printf("asdf");
 	fflush(stdout);
