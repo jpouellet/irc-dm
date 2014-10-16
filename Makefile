@@ -15,8 +15,6 @@ all: ressl event event_cat msg not_line
 
 ressl: bev_ressl.o ../libressl/libressl.a
 
-bev_ressl.o:
-
 msg.c: msg_regex.h
 	@touch msg.c
 
