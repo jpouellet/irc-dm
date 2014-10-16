@@ -8,8 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define NO_LINE "(empty)\n"
-
 void
 read_cb(struct bufferevent *bev_in, void *ctx)
 {
@@ -19,14 +17,11 @@ read_cb(struct bufferevent *bev_in, void *ctx)
 	size_t len;
 
 	buf = bufferevent_get_input(bev_in);
-	line = evbuffer_readln(buf, NULL, EVBUFFER_EOL_CRLF);
-	if (line) {
+	while ((line = evbuffer_readln(buf, NULL, EVBUFFER_EOL_CRLF)) != NULL) {
 		len = strlen(line);
 		line[len] = '\n';
 		bufferevent_write(bev_out, line, len + 1);
 		free(line);
-	} else {
-		bufferevent_write(bev_out, NO_LINE, strlen(NO_LINE));
 	}
 }
 
