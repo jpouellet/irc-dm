@@ -25,8 +25,9 @@ bufferevent_ressl_new(
 /*
  * Hack to do clean shutdowns cause BEV_OPT_CLOSE_ON_FREE doesn't.
  * XXX Should be removed when bufferevent_shutdown() is finished.
+ */
 void
-bev_shutdown_and_free(struct bufferevent *bev)
+bufferevent_ressl_shutdown_and_free(struct bufferevent *bev)
 {
 	SSL *ctx;
 
@@ -35,4 +36,3 @@ bev_shutdown_and_free(struct bufferevent *bev)
 		SSL_set_shutdown(ctx, SSL_RECEIVED_SHUTDOWN);
 	bufferevent_free(bev);
 }
-*/

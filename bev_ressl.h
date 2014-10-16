@@ -8,4 +8,6 @@ struct ressl;
 struct bufferevent *
 bufferevent_ressl_new(struct event_base *, struct ressl *, int);
 
+void bufferevent_ressl_shutdown_and_free(struct bufferevent *);
+
 #endif
