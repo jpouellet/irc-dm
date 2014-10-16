@@ -1,6 +1,6 @@
 include config.mk
 
-CFLAGS+=-Wall -Wextra -std=c89 -pedantic
+CFLAGS+=-Wall -Wextra -std=c89 -pedantic -g
 CFLAGS+=-Wno-unused-parameter -Wno-long-long
 
 .PHONY: clean regex regex-c
