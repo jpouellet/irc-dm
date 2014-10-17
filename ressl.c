@@ -45,6 +45,12 @@ ressl_read_cb(struct bufferevent *bev, void *ctx)
 }
 
 void
+generic_event_cb(struct bufferevent *bev, short what, void *ctx)
+{
+	printf("%s event: %hd\n", ctx ? "stdin" : "ssl", what);
+}
+
+void
 stdin_event_cb(struct bufferevent *bev, short what, void *ctx)
 {
 	if (what & BEV_EVENT_EOF) {
@@ -150,9 +156,9 @@ main(int argc, char *argv[])
 	if (bev_ressl == NULL)
 		errx(1, "bufferevent_ressl_new failed");
 
-	bufferevent_setcb(bev_stdin, &stdin_read_cb, NULL, stdin_event_cb,
+	bufferevent_setcb(bev_stdin, &stdin_read_cb, NULL, generic_event_cb,
 	    bev_ressl);
-	bufferevent_setcb(bev_ressl, &ressl_read_cb, NULL, ressl_event_cb,
+	bufferevent_setcb(bev_ressl, &ressl_read_cb, NULL, generic_event_cb,
 	    NULL);
 
 	if (bufferevent_enable(bev_stdin, EV_READ) == -1)
