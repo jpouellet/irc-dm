@@ -6,11 +6,12 @@ CFLAGS+=-Wno-unused-parameter -Wno-long-long
 .PHONY: clean regex regex-c
 
 event event_cat: LDFLAGS+=-levent_core
-ssl ressl bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
+ssl ressl segfault bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl \
+  -lcrypto
 ressl: LDFLAGS+=-lressl
 msg: CFLAGS+=-DTEST
 
-all: ressl event event_cat msg not_line
+all: ressl event event_cat msg not_line segfault
 
 ressl: bev_ressl.o
 
@@ -31,4 +32,5 @@ msg_regex.h: msg_regex_bnf.c
 	$(CPP) -DJUST_PREPROCESS $< | tail -1 > $@
 
 clean:
-	rm -f msg_regex.h msg event event_cat ssl ressl bev_ressl.o not_line
+	rm -f msg_regex.h msg event event_cat ssl ressl bev_ressl.o not_line \
+	  segfault
