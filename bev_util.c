@@ -4,7 +4,12 @@
 
 #include <event2/bufferevent.h>
 #include <event2/bufferevent_ssl.h>
+
 #include <ressl.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "libressl/ressl_internal.h"
 #include "bev_util.h"
 
@@ -36,4 +41,23 @@ bufferevent_ressl_shutdown_and_free(struct bufferevent *bev)
 	if (ctx != NULL)
 		SSL_set_shutdown(ctx, SSL_RECEIVED_SHUTDOWN);
 	bufferevent_free(bev);
+}
+
+int
+bufferevent_printf(struct bufferevent *bev, const char *fmt, ...)
+{
+	va_list ap;
+	char *str = NULL;
+	int ret;
+
+	va_start(ap, fmt);
+	vasprintf(&str, fmt, ap);
+	va_end(ap);
+
+	if (str == NULL)
+		return -1;
+
+	ret = bufferevent_write(bev, str, strlen(str));
+	free(str);
+	return (ret == 0 ? 0 : -1);
 }
