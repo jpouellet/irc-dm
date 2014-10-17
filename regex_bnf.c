@@ -52,7 +52,7 @@
 
 //  special    =  %x5B-60 / %x7B-7D
 //                   ; "[", "]", "\\", "`", "_", "^", "{", "|", "}"
-#define special "\\[\\]\\\\`_\\^\\{\\|\\}"
+#define special "][\\`_^{|}"
 
 //  digit      =  %x30-39                 ; 0-9
 #define digit "0-9"
@@ -68,7 +68,7 @@
 #define user "([^ @]+)"
 
 //  nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
-#define nickname "[" letter special "][-" letter digit special "]*"
+#define nickname "[" special letter "][" special letter digit "-]*"
 
 //  ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
 #define ip4addr "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
