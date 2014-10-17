@@ -34,3 +34,4 @@ msg_regex.h: msg_regex_bnf.c
 clean:
 	rm -f msg_regex.h msg event event_cat ssl ressl bev_ressl.o not_line \
 	  segfault
+	rm -rf *.dSYM
