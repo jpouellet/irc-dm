@@ -14,7 +14,7 @@ struct msg {
 	char *trailing;
 };
 
-void msg_parser_init(void);
+int msg_parser_init(void);
 void msg_free(struct msg *);
 struct msg * msg_parse(const char *);
 char * msg_param(const struct msg *, off_t param);

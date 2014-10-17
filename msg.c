@@ -31,11 +31,16 @@ static const char msg_regex[] =
 static regex_t preg;
 static regmatch_t pmatch[PAT_NPMATCH];
 
-void
+int
 msg_parser_init(void)
 {
-	assert(regcomp(&preg, msg_regex, REG_EXTENDED) == 0);
-	assert(preg.re_nsub == PAT_NSUB);
+	if (regcomp(&preg, msg_regex, REG_EXTENDED) != 0)
+		return -1;
+
+	if (preg.re_nsub != PAT_NSUB)
+		return -1;
+
+	return 0;
 }
 
 void
