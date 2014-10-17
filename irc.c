@@ -23,26 +23,21 @@ irc_login(struct bufferevent *bev, const char *nick, const char *user,
 		warnx("invalid nick");
 		return -1;
 	}
-printf("%s:%d\n", __func__, __LINE__);
 	if (!is_valid_username(user)) {
 		warnx("invalid username");
 		return -1;
 	}
-printf("%s:%d\n", __func__, __LINE__);
 	if (!is_valid_realname(real)) {
 		warnx("invalid realname");
 		return -1;
 	}
 
-printf("%s:%d\n", __func__, __LINE__);
 	asprintf(&str, "NICK %s\r\nUSER %s 0 * :%s\r\n", nick, user, real);
 	if (str == NULL)
 		return -1;
 
-printf("%s:%d\n", __func__, __LINE__);
 	ret = bufferevent_write(bev, str, strlen(str));
 	free(str);
-printf("%s:%d\n", __func__, __LINE__);
 	return (ret == 0 ? 0 : -1);
 }
 
