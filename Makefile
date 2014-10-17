@@ -6,17 +6,27 @@ CFLAGS+=-Wno-unused-parameter -Wno-long-long
 .PHONY: clean regex regex-c
 
 event event_cat: LDFLAGS+=-levent_core
-ssl ressl bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
-ressl: LDFLAGS+=-lressl
-msg: CFLAGS+=-DTEST
+irc-dm ssl ressl bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
+irc-dm ressl: LDFLAGS+=-lressl
+msg_test: CPPFLAGS+=-DTEST
 regex regex-c: TERMINAL?=message
 
-all: ressl event event_cat msg not_line
+all: irc-dm ressl event event_cat msg_test util_test not_line
+
+irc-dm: main.o irc.o msg.o util.o bev_ressl.o
+	$(CC) $(LDFLAGS) -o $@ $^
 
 ressl: bev_ressl.o
 
 msg.c: regex/message.h
 	@touch msg.c
+
+util.c: regex/nickname.h
+	@touch util.c
+
+msg_test: msg.o
+
+util_test: util.o
 
 regex:
 	@$(CC) -DTERMINAL=$(TERMINAL) regex_bnf.c -o regex_bnf
@@ -37,5 +47,6 @@ regex/nickname.h: regex_bnf.c
 	$(CPP) -DJUST_PREPROCESS -DTERMINAL=nickname $< | tail -1 > $@
 
 clean:
-	rm -f msg event event_cat ssl ressl bev_ressl.o not_line
+	rm -f msg msg_test util_test event event_cat ssl ressl not_line \
+	    irc-dm *.o
 	rm -rf regex/ *.dSYM
