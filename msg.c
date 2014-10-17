@@ -83,6 +83,17 @@ extract(const char *str, const regmatch_t *match, char **store)
 	return 0;
 }
 
+static size_t
+rtrim(char *str)
+{
+	char *p, *end;
+
+	p = end = str + strlen(str) - 1;
+	while (*p == ' ' && p >= str)
+		*p-- = '\0';
+	return (end - p);
+}
+
 struct msg *
 msg_parse(const char *line)
 {
@@ -111,11 +122,12 @@ msg_parse(const char *line)
 	    extract(line, &pmatch[CG_TRAILING], &msg->trailing))
 		goto cleanup;
 
-	if (extract(line, &pmatch[CG_COMMAND], &params))
+	if (extract(line, &pmatch[CG_PARAMS], &params))
 		goto cleanup;
 
 	if (params != NULL) {
-		n = 0;
+		assert(rtrim(params) == 1);
+		n = 1;
 		for (p = params; *p != '\0'; p++)
 			if (*p == ' ')
 				n++;
