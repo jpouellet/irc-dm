@@ -9,6 +9,7 @@ event event_cat: LDFLAGS+=-levent_core
 ssl ressl bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
 ressl: LDFLAGS+=-lressl
 msg: CFLAGS+=-DTEST
+regex regex-c: TERMINAL?=message
 
 all: ressl event event_cat msg not_line
 
@@ -18,12 +19,12 @@ msg.c: regex/message.h
 	@touch msg.c
 
 regex:
-	@$(CC) regex_bnf.c -o regex_bnf
+	@$(CC) -DTERMINAL=$(TERMINAL) regex_bnf.c -o regex_bnf
 	@./regex_bnf
 	@rm -f regex_bnf
 
 regex-c:
-	@$(CC) regex_bnf.c -DESCAPE -o regex_bnf
+	@$(CC) -DTERMINAL=$(TERMINAL) regex_bnf.c -DESCAPE -o regex_bnf
 	@./regex_bnf
 	@rm -f regex_bnf
 
