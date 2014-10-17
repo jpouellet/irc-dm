@@ -58,7 +58,7 @@
 #define digit "0-9"
 
 //  hexdigit   =  digit / "A" / "B" / "C" / "D" / "E" / "F"
-#define hexdigit digit "A-F"
+#define hexdigit digit "A-Fa-f"
 
 //  letter     =  %x41-5A / %x61-7A       ; A-Z / a-z
 #define letter "A-Za-z"
