@@ -9,7 +9,7 @@
 
 /* Big regex built up in readable parts. */
 static const char msg_regex[] =
-#include "msg_regex.h"
+#include "regex/message.h"
 ;
 
 /* Don't forget to update the capture groups! */

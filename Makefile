@@ -14,22 +14,27 @@ all: ressl event event_cat msg not_line
 
 ressl: bev_ressl.o
 
-msg.c: msg_regex.h
+msg.c: regex/message.h
 	@touch msg.c
 
 regex:
-	@$(CC) msg_regex_bnf.c -o msg_regex_bnf
-	@./msg_regex_bnf
-	@rm -f msg_regex_bnf
+	@$(CC) regex_bnf.c -o regex_bnf
+	@./regex_bnf
+	@rm -f regex_bnf
 
 regex-c:
-	@$(CC) msg_regex_bnf.c -DESCAPE -o msg_regex_bnf
-	@./msg_regex_bnf
-	@rm -f msg_regex_bnf
+	@$(CC) regex_bnf.c -DESCAPE -o regex_bnf
+	@./regex_bnf
+	@rm -f regex_bnf
 
-msg_regex.h: msg_regex_bnf.c
+regex/message.h: regex_bnf.c
+	@mkdir -p regex
 	$(CPP) -DJUST_PREPROCESS $< | tail -1 > $@
 
+regex/nickname.h: regex_bnf.c
+	@mkdir -p regex
+	$(CPP) -DJUST_PREPROCESS -DTERMINAL=nickname $< | tail -1 > $@
+
 clean:
-	rm -f msg_regex.h msg event event_cat ssl ressl bev_ressl.o not_line
-	rm -rf *.dSYM
+	rm -f msg event event_cat ssl ressl bev_ressl.o not_line
+	rm -rf regex/ *.dSYM
