@@ -6,17 +6,17 @@ CFLAGS+=-Wno-unused-parameter -Wno-long-long
 .PHONY: clean regex regex-c
 
 event event_cat: LDFLAGS+=-levent_core
-irc-dm ssl ressl bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
+irc-dm ssl ressl bev_util.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
 irc-dm ressl: LDFLAGS+=-lressl
 msg_test: CPPFLAGS+=-DTEST
 regex regex-c: TERMINAL?=message
 
 all: irc-dm ressl event event_cat msg_test util_test not_line
 
-irc-dm: main.o irc.o msg.o util.o bev_ressl.o
+irc-dm: main.o irc.o msg.o util.o bev_util.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-ressl: bev_ressl.o
+ressl: bev_util.o
 
 msg.c: regex/message.h
 	@touch msg.c

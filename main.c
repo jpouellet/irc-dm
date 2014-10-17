@@ -12,7 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bev_ressl.h"
+#include "bev_util.h"
 #include "irc.h"
 #include "msg.h"
 #include "util.h"

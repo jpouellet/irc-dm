@@ -6,7 +6,7 @@
 #include <event2/bufferevent_ssl.h>
 #include <ressl.h>
 #include "libressl/ressl_internal.h"
-#include "bev_ressl.h"
+#include "bev_util.h"
 
 struct bufferevent *
 bufferevent_ressl_new(

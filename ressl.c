@@ -12,7 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bev_ressl.h"
+#include "bev_util.h"
 
 void
 stdin_read_cb(struct bufferevent *bev, void *ctx)
