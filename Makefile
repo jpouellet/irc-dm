@@ -5,15 +5,14 @@ CFLAGS+=-Wno-unused-parameter -Wno-long-long
 
 .PHONY: clean regex regex-c
 
-event: LDFLAGS+=-levent
-event_cat: LDFLAGS+=-levent
-ssl: LDFLAGS+=-levent -lssl -levent_openssl
-ressl bev_ressl.o: LDFLAGS+=-levent -levent_openssl -lssl -lcrypto
+event event_cat: LDFLAGS+=-levent_core
+ssl ressl bev_ressl.o: LDFLAGS+=-levent_core -levent_openssl -lssl -lcrypto
+ressl: LDFLAGS+=-lressl
 msg: CFLAGS+=-DTEST
 
 all: ressl event event_cat msg not_line
 
-ressl: bev_ressl.o ../libressl/libressl.a
+ressl: bev_ressl.o
 
 msg.c: msg_regex.h
 	@touch msg.c
