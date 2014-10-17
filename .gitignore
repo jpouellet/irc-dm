@@ -1,10 +1,13 @@
 *.dSYM/
-bev_ressl.o
+*.o
 config.mk
 event
 event_cat
+irc-dm
 msg
+msg_test
 not_line
 regex/
 ressl
 segfault
+util_test
