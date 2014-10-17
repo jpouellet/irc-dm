@@ -1,5 +1,6 @@
 *.dSYM/
 *.o
+*.swp
 config.mk
 event
 event_cat
