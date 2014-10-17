@@ -7,10 +7,46 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bev_util.h"
 #include "msg.h"
 #include "util.h"
 
-static void irc_msg_dispatch(struct msg *);
+static int irc_msg_dispatch(struct msg *, struct bufferevent *);
+void cmd_privmsg(struct msg *, struct bufferevent *);
+void cmd_ping(struct msg *, struct bufferevent *);
+
+struct irc_command {
+	const char *name;
+	void (*callback)(struct msg *, struct bufferevent *);
+} dispatch_table[] = {
+	{"PRIVMSG", cmd_privmsg},
+	{"PING", cmd_ping}
+};
+#define N_COMMANDS (sizeof(dispatch_table) / sizeof(dispatch_table[0]))
+
+void
+cmd_privmsg(struct msg *msg, struct bufferevent *bev)
+{
+	if (msg->nick == NULL || msg->trailing == NULL)
+		return;
+
+	printf("%s: %s\n", msg->nick, msg->trailing);
+	bufferevent_printf(bev, "PRIVMSG %s :You said: %s\n",
+	    msg->nick, msg->trailing);
+}
+
+void
+cmd_ping(struct msg *msg, struct bufferevent *bev)
+{
+	char *cookie;
+
+	cookie = msg->trailing;
+	if (cookie == NULL)
+		cookie = "";
+
+	printf("PONGing (%s)\n", cookie);
+	bufferevent_printf(bev, "PONG :%s\n", cookie);
+}
 
 int
 irc_login(struct bufferevent *bev, const char *nick, const char *user,
@@ -52,7 +88,7 @@ irc_bev_read_cb(struct bufferevent *bev, void *ctx)
 	while ((line = evbuffer_readln(buf, NULL, EVBUFFER_EOL_CRLF)) != NULL) {
 		msg = msg_parse(line);
 		if (msg != NULL) {
-			irc_msg_dispatch(msg);
+			irc_msg_dispatch(msg, bev);
 			msg_free(msg);
 		}
 		free(line);
@@ -74,10 +110,22 @@ irc_bev_event_cb(struct bufferevent *bev, short what, void *ctx)
 	}
 }
 
-static void
-irc_msg_dispatch(struct msg *msg)
+static int
+irc_msg_dispatch(struct msg *msg, struct bufferevent *bev)
 {
+	struct irc_command *cmd;
+	size_t i;
+
 	msg_dump(msg);
+
+	for (i = 0; i < N_COMMANDS; i++) {
+		cmd = &dispatch_table[i];
+		if (strcasecmp(msg->command, cmd->name) == 0) {
+			cmd->callback(msg, bev);
+			return 0;
+		}
+	}
+	return -1;
 }
 
 /*
