@@ -127,19 +127,3 @@ irc_msg_dispatch(struct msg *msg, struct bufferevent *bev)
 	}
 	return -1;
 }
-
-/*
-struct msg {
-	char *raw;
-	char *prefix;
-	char *server;
-	char *nick;
-	char *user;
-	char *host;
-	char *command;
-	size_t n_params;
-	char **params;
-	char *trailing;
-};
-char * msg_param(const struct msg *, off_t param);
-*/
