@@ -1,9 +1,11 @@
 -include ../config.mk
 
 CFLAGS+=-Wall -Wextra -std=c99 -pedantic -Wno-unused-parameter -Wno-unused-function
+CFLAGS+=-g
 
-SPLAY_TREE_OBJS= index_splay.o index_splay_record.o
-RB_TREE_OBJS= index_rb.o index_rb_record.o
+TREE_HDRS= openbsd_sys/tree.h
+SPLAY_TREE_OBJS= index_splay_detached.o index_splay_record.o
+RB_TREE_OBJS= index_rb_detached.o index_rb_record.o
 TREE_OBJS= $(SPLAY_TREE_OBJS) $(RB_TREE_OBJS)
 INDEX_OBJS=	index_db_btree.o index_db_hash.o \
 		index_list.o index_ohash.o \
@@ -35,7 +37,10 @@ benchmark_%: index_%.o benchmark.o
 index_db_btree.o index_db_hash.o: index_db.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
-$(TREE_OBJS): index_tree.c openbsd_sys/tree.h
+index_%_detached.o: index_tree.c $(TREE_HDRS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+index_%_record.o: index_tree_record.c $(TREE_HDRS)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 index_*.c: index.h
