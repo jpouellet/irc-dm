@@ -26,4 +26,4 @@ index_*.c: index.h
 	@touch $@
 
 clean:
-	rm -f $(OBJS) index_splay.c index_rb.c
+	rm -f $(OBJS)
