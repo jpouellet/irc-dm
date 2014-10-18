@@ -19,10 +19,10 @@ irc-dm: main.o irc.o msg.o util.o bev_util.o
 ressl: bev_util.o
 
 msg.c: regex/message.h
-	@touch msg.c
+	@touch $@
 
 util.c: regex/nickname.h
-	@touch util.c
+	@touch $@
 
 msg_test: msg.o
 
