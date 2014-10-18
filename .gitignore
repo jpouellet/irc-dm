@@ -5,6 +5,7 @@
 config.mk
 event
 event_cat
+index/benchmark_*
 irc-dm
 msg
 msg_test
