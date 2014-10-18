@@ -6,13 +6,14 @@
 
 #include "openbsd_sys/tree.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "index.h"
 
 struct record {
-	T(ENTRY)(node) entry;
+	T(ENTRY)(record) entry;
 	void *val;
 	char key[];
 };
@@ -30,8 +31,8 @@ record_new(const char *key)
 	if (new == NULL)
 		return NULL;
 
-	(void)strcpy(record->key, key);
-	return record;
+	(void)strcpy(new->key, key);
+	return new;
 }
 
 int
@@ -40,9 +41,9 @@ record_cmp(const struct record *r1, const struct record *r2)
 	return strcmp(r1->key, r2->key);
 }
 
-T(HEAD)(index, node);
-T(PROTOTYPE)(index, node, entry, nodecmp)
-T(GENERATE)(index, node, entry, nodecmp)
+T(HEAD)(index, record);
+T(PROTOTYPE)(index, record, entry, record_cmp)
+T(GENERATE)(index, record, entry, record_cmp)
 
 struct index *
 index_new(void)
@@ -61,7 +62,6 @@ int
 index_put(struct index *idx, const char *key, void *val)
 {
 	struct record *new = NULL, *old;
-	int rv = -1;
 
 	new = record_new(key);
 	if (new == NULL)
@@ -71,7 +71,7 @@ index_put(struct index *idx, const char *key, void *val)
 
 	old = T(INSERT)(index, idx, new);
 	if (old != NULL) {
-		free(new)
+		free(new);
 		return 1;
 	}
 	return 0;
@@ -80,10 +80,10 @@ index_put(struct index *idx, const char *key, void *val)
 int
 index_get(struct index *idx, const char *key, void **val)
 {
-	struct node *res;
+	struct record *res;
 
 	/* XXX will this always be safe? or should i create an actual elm */
-	res = T(FIND)(index, idx, key - KEY_OFFSET);
+	res = T(FIND)(index, idx, (struct record *)(key - KEY_OFFSET));
 	if (res == NULL)
 		return 1;
 
@@ -95,10 +95,9 @@ index_get(struct index *idx, const char *key, void **val)
 int
 index_del(struct index *idx, const char *key)
 {
-	struct node find, *removed;
+	struct record *removed;
 
-	find.key = key;
-	removed = T(REMOVE)(index, idx, &find);
+	removed = T(REMOVE)(index, idx, (struct record *)(key - KEY_OFFSET));
 	if (removed == NULL)
 		return 1;
 
