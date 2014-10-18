@@ -1,5 +1,6 @@
 *.dSYM/
 *.o
+*.so
 *.swp
 config.mk
 event
