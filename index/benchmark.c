@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <err.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -18,7 +19,12 @@ __get(struct index *idx, const char *key, void *val)
 	void *data;
 	int rv;
 
+	errno = 0;
 	rv = index_get(idx, key, &data);
+	if (rv == -1) {
+		warn("index_get -1");
+		return -1;
+	}
 
 	if (val != NULL) {
 		/* we expect something in particular */
@@ -41,7 +47,12 @@ __put(struct index *idx, const char *key, void *val)
 {
 	int rv;
 
+	errno = 0;
 	rv = index_put(idx, key, val);
+	if (rv == -1) {
+		warn("index_put -1");
+		return -1;
+	}
 
 	if (val != NULL) {
 		/* we expect it to have been inserted */
@@ -62,7 +73,12 @@ __del(struct index *idx, const char *key, void *val)
 {
 	int rv;
 
+	errno = 0;
 	rv = index_del(idx, key);
+	if (rv == -1) {
+		warn("index_del -1");
+		return -1;
+	}
 
 	if (val != NULL) {
 		/* we expected something there */
