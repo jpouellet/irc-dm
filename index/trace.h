@@ -4,8 +4,8 @@
 struct trace;
 
 int __trace_iterate(const struct trace *, const char **);
-const struct trace * trace_load(const char *);
-void trace_free(const struct trace *);
+struct trace * trace_load(const char *);
+void trace_free(struct trace *);
 
 #define trace_foreach(t,p) for ((p) = NULL; __trace_iterate((t), &(p)); )
 

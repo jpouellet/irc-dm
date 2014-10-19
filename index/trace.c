@@ -21,7 +21,7 @@ __trace_iterate(const struct trace *t, const char **p)
 	return 1;
 }
 
-const struct trace *
+struct trace *
 trace_load(const char *path)
 {
 	struct stat st;
@@ -80,7 +80,7 @@ fail:
 }
 
 void
-trace_free(const struct trace *t)
+trace_free(struct trace *t)
 {
-	free((struct trace *)t);
+	free(t);
 }
