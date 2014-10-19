@@ -75,7 +75,7 @@ int
 index_put(struct index *idx, const char *key, void *val)
 {
 	struct record *rec;
-	const char *end;
+	const char *end = NULL;
 	unsigned int slot;
 
 	if (idx->read_only)
