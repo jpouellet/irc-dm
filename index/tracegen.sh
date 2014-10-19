@@ -53,4 +53,4 @@ generate() {
 	done
 }
 
-generate | sort -n | cut -f 2-
+generate | sort -sn | cut -f 2-
