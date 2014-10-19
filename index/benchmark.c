@@ -11,102 +11,36 @@
 #include <unistd.h>
 
 #include "index.h"
+#include "trace.h"
 
 #define DEFAULT_SECS (3)
 
 bool quiet = false;
 
+#define MAGIC ((void *)0xdeadbeef)
+
 int
-__get(struct index *idx, const char *key, void *val)
+do_round(struct index *idx, struct trace *t)
 {
+	const char *p;
 	void *data;
-	int rv;
 
-	errno = 0;
-	rv = index_get(idx, key, &data);
-	if (rv == -1) {
-		warn("index_get -1");
-		return -1;
+	trace_foreach(t, p) {
+		switch (*p) {
+		case '+':
+			assert(index_put(idx, p + 1, MAGIC) == 0);
+			break;
+		case ' ':
+			assert(index_get(idx, p + 1, &data) == 0);
+			assert(data == MAGIC);
+			break;
+		case '-':
+			assert(index_del(idx, p + 1) == 0);
+			break;
+		default:
+			errx(1, "invalid trace command character (%c)", *p);
+		}
 	}
-
-	if (val != NULL) {
-		/* we expect something in particular */
-		if (rv != 0)
-			return -1;
-		if (data != val)
-			return -1;
-	} else {
-		/* we expect it missing */
-		if (rv != 1)
-			return -1;
-	}
-	return 0;
-}
-#define _get(k,v) (__get(idx,(k),(void *)(v)))
-#define G(k,v) assert(_get((#k),(v)) == 0)
-
-int
-__put(struct index *idx, const char *key, void *val)
-{
-	int rv;
-
-	errno = 0;
-	rv = index_put(idx, key, val);
-	if (rv == -1) {
-		warn("index_put -1");
-		return -1;
-	}
-
-	if (val != NULL) {
-		/* we expect it to have been inserted */
-		if (rv != 0)
-			return -1;
-	} else {
-		/* we expected something else there */
-		if (rv != 1)
-			return -1;
-	}
-	return 0;
-}
-#define _put(k,v) (__put(idx,(k),(void *)(v)))
-#define P(k,v) assert(_put((#k),(v)) == 0)
-
-int
-__del(struct index *idx, const char *key, void *val)
-{
-	int rv;
-
-	errno = 0;
-	rv = index_del(idx, key);
-	if (rv == -1) {
-		warn("index_del -1");
-		return -1;
-	}
-
-	if (val != NULL) {
-		/* we expected something there */
-		if (rv != 0)
-			return -1;
-	} else {
-		/* we expected it missing */
-		if (rv != 1)
-			return -1;
-	}
-	return 0;
-}
-#define _del(k,v) (__del(idx,(k),(void *)(v)))
-#define D(k,v) assert(_del((#k),(v)) == 0)
-
-#define X ((void *)(1))
-
-int
-do_round(struct index *idx)
-{
-	G(foo, NULL);
-	P(foo, 1234);
-	G(foo, 1234);
-	D(foo, X);
-	D(foo, NULL);
 
 	return 0;
 }
@@ -151,7 +85,7 @@ stats(const struct rusage *begin, const struct rusage *end, size_t rounds)
 void
 usage(void)
 {
-	fprintf(stderr, "Usage: %s [-q] [-t secs] index.so ...\n", getprogname());
+	fprintf(stderr, "Usage: %s [-q] [-t secs] trace\n", getprogname());
 	exit(1);
 }
 
@@ -160,6 +94,7 @@ main(int argc, char *argv[])
 {
 	struct rusage begin, end;
 	struct itimerval timer;
+	struct trace *trace;
 	struct index *idx;
 	int ch, ret;
 	time_t secs = DEFAULT_SECS;
@@ -183,6 +118,14 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
+	if (argc != 1)
+		usage();
+
+	errno = 0;
+	trace = trace_load(argv[0]);
+	if (trace == NULL)
+		err(1, "trace_load");
+
 	idx = index_new();
 	if (idx == NULL)
 		errx(1, "index_new failed");
@@ -199,7 +142,7 @@ main(int argc, char *argv[])
 	setitimer(ITIMER_PROF, &timer, NULL);
 	getrusage(RUSAGE_SELF, &begin);
 	do {
-		ret = do_round(idx);
+		ret = do_round(idx, trace);
 		if (ret != 0)
 			errx(1, "failed in round %zu", round);
 		round++;

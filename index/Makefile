@@ -13,6 +13,8 @@ INDEX_OBJS=	index_db_btree.o index_db_hash.o \
 		$(TREE_OBJS)
 OBJS=	$(INDEX_OBJS) benchmark.o trace.o
 
+TRACE_FILE=benchmark.trace
+
 BENCHMARKS= $(patsubst index_%.o,benchmark_%,$(INDEX_OBJS))
 
 $(SPLAY_TREE_OBJS): CPPFLAGS+=-D"T(x)=T_(x,SPLAY)"
@@ -26,12 +28,15 @@ all: $(OBJS) $(BENCHMARKS)
 
 objs: $(OBJS)
 
-bench: $(BENCHMARKS)
+$(TRACE_FILE):
+	./tracegen.sh 100 50 10 5 > $@
+
+bench: $(BENCHMARKS) $(TRACE_FILE)
 	@for benchmark in $(BENCHMARKS); do \
-	  ./$$benchmark -t $(SECS_EACH); \
+	  ./$$benchmark -t $(SECS_EACH) $(TRACE_FILE); \
 	done
 
-benchmark_%: index_%.o benchmark.o
+benchmark_%: index_%.o benchmark.o trace.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 index_db_btree.o index_db_hash.o: index_db.c
