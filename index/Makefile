@@ -26,11 +26,7 @@ all: $(OBJS) $(BENCHMARKS)
 objs: $(OBJS)
 
 bench: $(BENCHMARKS)
-	@for benchmark in $(BENCHMARKS); do \
-	  echo $$benchmark; \
-	  ./$$benchmark; \
-	  echo; \
-	done
+	@for benchmark in $(BENCHMARKS); do ./$$benchmark; done
 
 benchmark_%: index_%.o benchmark.o
 	$(CC) $(LDFLAGS) -o $@ $^
