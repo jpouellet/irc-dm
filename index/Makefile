@@ -11,7 +11,7 @@ TREE_OBJS= $(SPLAY_TREE_OBJS) $(RB_TREE_OBJS)
 INDEX_OBJS=	index_db_btree.o index_db_hash.o \
 		index_list.o index_ohash.o \
 		$(TREE_OBJS)
-OBJS=	$(INDEX_OBJS) benchmark.o
+OBJS=	$(INDEX_OBJS) benchmark.o trace.o
 
 BENCHMARKS= $(patsubst index_%.o,benchmark_%,$(INDEX_OBJS))
 
@@ -44,6 +44,9 @@ index_%_record.o: index_tree_record.c $(TREE_HDRS)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 index_*.c: index.h
+	@touch $@
+
+benchmark.c trace.c: trace.h
 	@touch $@
 
 clean:
