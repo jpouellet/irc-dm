@@ -20,13 +20,16 @@ $(RB_TREE_OBJS): CPPFLAGS+=-D"T(x)=T_(x,RB)"
 index_db_btree.o: CPPFLAGS+=-DMY_DB_TYPE=DB_BTREE
 index_db_hash.o: CPPFLAGS+=-DMY_DB_TYPE=DB_HASH
 benchmark_ohash: LDFLAGS+=-lutil
+bench: SECS_EACH?=1
 
 all: $(OBJS) $(BENCHMARKS)
 
 objs: $(OBJS)
 
 bench: $(BENCHMARKS)
-	@for benchmark in $(BENCHMARKS); do ./$$benchmark; done
+	@for benchmark in $(BENCHMARKS); do \
+	  ./$$benchmark -t $(SECS_EACH); \
+	done
 
 benchmark_%: index_%.o benchmark.o
 	$(CC) $(LDFLAGS) -o $@ $^
