@@ -7,31 +7,49 @@
 #include "openbsd_sys/tree.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "index.h"
 
-struct node {
-	T(ENTRY)(node) entry;
-	const char *key;
+struct record {
+	T(ENTRY)(record) entry;
 	void *val;
+	char key[];
 };
 
-int
-nodecmp(const struct node *e1, const struct node *e2)
+#define KEY_OFFSET (offsetof(struct record, key))
+
+struct record *
+record_new(const char *key)
 {
-	return strcmp(e1->key, e2->key);
+	struct record *new;
+	size_t len;
+
+	len = strlen(key) + 1;
+	new = malloc(KEY_OFFSET + len);
+	if (new == NULL)
+		return NULL;
+
+	(void)strcpy(new->key, key);
+	return new;
 }
 
-T(HEAD)(index, node);
-T(PROTOTYPE)(index, node, entry, nodecmp)
-T(GENERATE)(index, node, entry, nodecmp)
+int
+record_cmp(const struct record *r1, const struct record *r2)
+{
+	return strcmp(r1->key, r2->key);
+}
+
+T(HEAD)(index, record);
+T(PROTOTYPE)(index, record, entry, record_cmp)
+T(GENERATE)(index, record, entry, record_cmp)
 
 struct index *
 index_new(void)
 {
-	struct index *new = NULL;
+	struct index *new;
 
 	new = malloc(sizeof(*new));
 	if (new == NULL)
@@ -44,41 +62,29 @@ index_new(void)
 int
 index_put(struct index *idx, const char *key, void *val)
 {
-	struct node *new = NULL, *old;
-	char *keydup = NULL;
-	int rv = -1;
+	struct record *new = NULL, *old;
 
-	new = malloc(sizeof(*new));
+	new = record_new(key);
 	if (new == NULL)
-		goto fail;
+		return -1;
 
-	keydup = strdup(key);
-	if (keydup == NULL)
-		goto fail;
-
-	new->key = keydup;
 	new->val = val;
 
 	old = T(INSERT)(index, idx, new);
 	if (old != NULL) {
-		rv = 1;
-		goto fail;
+		free(new);
+		return 1;
 	}
 	return 0;
-
-fail:
-	free(new);
-	free(keydup);
-	return rv;
 }
 
 int
 index_get(struct index *idx, const char *key, void **val)
 {
-	struct node find, *res;
+	struct record *res;
 
-	find.key = key;
-	res = T(FIND)(index, idx, &find);
+	/* XXX will this always be safe? or should i create an actual elm */
+	res = T(FIND)(index, idx, (struct record *)(key - KEY_OFFSET));
 	if (res == NULL)
 		return 1;
 
@@ -90,17 +96,15 @@ index_get(struct index *idx, const char *key, void **val)
 int
 index_del(struct index *idx, const char *key)
 {
-	struct node search, *found, *removed;
+	struct record *found, *removed;
 
-	search.key = key;
-	found = T(FIND)(index, idx, &search);
+	found = T(FIND)(index, idx, (struct record *)(key - KEY_OFFSET));
 	if (found == NULL)
 		return 1;
 
 	removed = T(REMOVE)(index, idx, found);
 	assert(removed == found);
 
-	free((void *)removed->key);
 	free(removed);
 	return 0;
 }
