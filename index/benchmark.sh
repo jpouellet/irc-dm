@@ -12,4 +12,5 @@ mkdir -p traces
 trace typical 100 50 10 5 1000 30 2
 trace dos 1000 5 1 3 1000 0 0
 trace high-volume 10 20 10 40 1000 0 0
-trace spammers 100 50 10 5 500 40 1
+trace spammers 100 50 50 50 500 40 1
+trace large-spammers 100 50 50 50 500 200 1
