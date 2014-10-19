@@ -2,6 +2,7 @@
 
 CFLAGS+=-Wall -Wextra -std=c99 -pedantic
 CFLAGS+=-Wno-unused-parameter -Wno-unused-function
+CFLAGS+=-O2
 CFLAGS+=-g
 
 TREE_HDRS= openbsd_sys/tree.h
