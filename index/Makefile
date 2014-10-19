@@ -9,7 +9,8 @@ SPLAY_TREE_OBJS= index_splay_detached.o index_splay_record.o
 RB_TREE_OBJS= index_rb_detached.o index_rb_record.o
 TREE_OBJS= $(SPLAY_TREE_OBJS) $(RB_TREE_OBJS)
 INDEX_OBJS=	index_db_btree.o index_db_hash.o \
-		index_list.o index_ohash.o \
+		index_list.o index_list_front.o \
+		index_list_keydup.o index_ohash.o \
 		$(TREE_OBJS)
 OBJS=	$(INDEX_OBJS) benchmark.o trace.o
 

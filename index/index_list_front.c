@@ -62,34 +62,18 @@ index_put(struct index *idx, const char *key, void *val)
 	return 0;
 }
 
-int
-index_get(struct index *idx, const char *key, void **val)
+static struct record *
+find_rm(struct index *idx, const char *key)
 {
-	struct record *p;
-
-	SLIST_FOREACH(p, idx, next) {
-		if (strcmp(key, p->key) == 0) {
-			if (val)
-				*val = p->val;
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-int
-index_del(struct index *idx, const char *key)
-{
-	struct record *last = NULL, *p;
+	struct record *last = NULL, *r;
 	int found = 0;
 
-	SLIST_FOREACH(p, idx, next) {
-		if (strcmp(key, p->key) == 0) {
+	SLIST_FOREACH(r, idx, next) {
+		if (strcmp(key, r->key) == 0) {
 			found = 1;
 			break;
 		}
-		last = p;
+		last = r;
 	}
 
 	if (found) {
@@ -97,9 +81,35 @@ index_del(struct index *idx, const char *key)
 			SLIST_REMOVE_HEAD(idx, next);
 		else
 			SLIST_REMOVE_AFTER(last, next);
-		free(p);
+		return r;
+	}
+	return NULL;
+}
+
+int
+index_get(struct index *idx, const char *key, void **val)
+{
+	struct record *r;
+
+	r = find_rm(idx, key);
+	if (r) {
+		SLIST_INSERT_HEAD(idx, r, next);
+		if (val)
+			*val = r->val;
 		return 0;
 	}
+	return 1;
+}
 
+int
+index_del(struct index *idx, const char *key)
+{
+	struct record *r;
+
+	r = find_rm(idx, key);
+	if (r) {
+		free(r);
+		return 0;
+	}
 	return 1;
 }
