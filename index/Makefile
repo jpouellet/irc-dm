@@ -32,7 +32,7 @@ trace $(TRACE_FILE): tracegen.sh
 
 bench: $(BENCHMARKS) $(TRACE_FILE)
 	@for benchmark in $(BENCHMARKS); do \
-	  ./$$benchmark -t $(SECS_EACH) $(TRACE_FILE); \
+	  ./$$benchmark -q -t $(SECS_EACH) $(TRACE_FILE); \
 	done
 
 benchmark_%: index_%.o benchmark.o trace.o
