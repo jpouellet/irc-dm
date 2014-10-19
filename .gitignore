@@ -6,6 +6,7 @@ config.mk
 event
 event_cat
 index/benchmark_*
+index/traces/
 irc-dm
 msg
 msg_test
