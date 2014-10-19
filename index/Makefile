@@ -1,6 +1,7 @@
 -include ../config.mk
 
-CFLAGS+=-Wall -Wextra -std=c99 -pedantic -Wno-unused-parameter -Wno-unused-function
+CFLAGS+=-Wall -Wextra -std=c99 -pedantic
+CFLAGS+=-Wno-unused-parameter -Wno-unused-function
 CFLAGS+=-g
 
 TREE_HDRS= openbsd_sys/tree.h
