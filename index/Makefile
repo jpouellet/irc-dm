@@ -50,4 +50,4 @@ benchmark.c trace.c: trace.h
 	@touch $@
 
 clean:
-	rm -f $(OBJS) $(BENCHMARKS)
+	rm -f $(OBJS) $(BENCHMARKS) *.core
