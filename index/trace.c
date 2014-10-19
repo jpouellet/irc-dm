@@ -16,7 +16,7 @@ __trace_iterate(const struct trace *t, const char **p)
 	}
 
 	*p = strchr(*p, '\0') + 1;
-	if (*p == '\0')
+	if (**p == '\0')
 		return 0;
 	return 1;
 }
