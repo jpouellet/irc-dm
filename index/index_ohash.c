@@ -78,7 +78,7 @@ index_put(struct index *idx, const char *key, void *val)
 	const char *end;
 	unsigned int slot;
 
-	if (&idx->read_only)
+	if (idx->read_only)
 		return -1;
 
 	slot = ohash_qlookup(&idx->h, key);
@@ -116,7 +116,7 @@ index_del(struct index *idx, const char *key)
 	struct record *rec;
 	unsigned int slot;
 
-	if (&idx->read_only)
+	if (idx->read_only)
 		return -1;
 
 	slot = ohash_qlookup(&idx->h, key);
