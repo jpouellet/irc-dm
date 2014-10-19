@@ -48,7 +48,7 @@ index_get(struct index *idx, const char *key, void **val)
 	if (ret == 0) {
 		assert(dbt_val.size == sizeof(val));
 		if (val)
-			*val = dbt_val.data;
+			*val = *(void **)dbt_val.data;
 	}
 	return ret;
 }
