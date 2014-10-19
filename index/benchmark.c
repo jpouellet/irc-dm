@@ -78,9 +78,12 @@ stats(const struct rusage *begin, const struct rusage *end, size_t rounds)
 	usr_rate = (double)rounds / usr_delta;
 	rate = (double)rounds / delta;
 
-	printf("%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%s\n",
-	    rounds, usr_delta, sys_delta, delta, usr_rate, rate,
-	    getprogname());
+	if (quiet)
+		printf("%.0lf\t%s\n", rate, getprogname());
+	else
+		printf("%ld\t%lf\t%lf\t%lf\t%lf\t%lf\t%s\n",
+		    rounds, usr_delta, sys_delta, delta, usr_rate, rate,
+		    getprogname());
 }
 
 void
