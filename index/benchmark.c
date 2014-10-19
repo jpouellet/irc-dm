@@ -183,6 +183,10 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
+	idx = index_new();
+	if (idx == NULL)
+		errx(1, "index_new failed");
+
 	timer.it_interval.tv_sec = 0;
 	timer.it_interval.tv_usec = 0;
 	timer.it_value.tv_sec = secs;
@@ -195,10 +199,6 @@ main(int argc, char *argv[])
 	setitimer(ITIMER_PROF, &timer, NULL);
 	getrusage(RUSAGE_SELF, &begin);
 	do {
-		idx = index_new();
-		if (idx == NULL)
-			errx(1, "index_new failed in round %zu", round);
-
 		ret = do_round(idx);
 		if (ret != 0)
 			errx(1, "failed in round %zu", round);
