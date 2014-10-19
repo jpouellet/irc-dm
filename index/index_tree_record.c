@@ -49,7 +49,7 @@ T(GENERATE)(index, record, entry, record_cmp)
 struct index *
 index_new(void)
 {
-	struct index *new = NULL;
+	struct index *new;
 
 	new = malloc(sizeof(*new));
 	if (new == NULL)
