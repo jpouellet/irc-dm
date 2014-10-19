@@ -6,6 +6,7 @@
 
 #include "openbsd_sys/tree.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -89,12 +90,15 @@ index_get(struct index *idx, const char *key, void **val)
 int
 index_del(struct index *idx, const char *key)
 {
-	struct node find, *removed;
+	struct node search, *found, *removed;
 
-	find.key = key;
-	removed = T(REMOVE)(index, idx, &find);
-	if (removed == NULL)
+	search.key = key;
+	found = T(FIND)(index, idx, &search);
+	if (found == NULL)
 		return 1;
+
+	removed = T(REMOVE)(index, idx, found);
+	assert(removed == found);
 
 	free((void *)removed->key);
 	free(removed);
