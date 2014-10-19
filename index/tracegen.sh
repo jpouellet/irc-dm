@@ -17,9 +17,14 @@ ppl_int=$1;	shift
 name_max=12
 name_min=6 # long enough that dupes are improbable
 
+head_c() {
+	[ -n "$2" ] && f="if=$2" || f=
+	dd bs=$1 count=1 $f 2>/dev/null
+}
+
 pick_name() {
-	head -c $name_max /dev/random | base64 | sed 's/[+/]//g' \
-	| head -c $((($RANDOM % ($name_max - $name_min)) + $name_min))
+	head_c $name_max /dev/random | base64 | sed 's/[+/]//g' \
+	| head_c $((($RANDOM % ($name_max - $name_min)) + $name_min))
 }
 
 update_time() {
