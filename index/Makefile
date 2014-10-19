@@ -26,8 +26,8 @@ all: $(OBJS) $(BENCHMARKS)
 
 objs: $(OBJS)
 
-$(TRACE_FILE):
-	./tracegen.sh 100 50 10 5 > $@
+trace $(TRACE_FILE): tracegen.sh
+	./tracegen.sh 100 50 10 5 500 30 1 > $(TRACE_FILE)
 
 bench: $(BENCHMARKS) $(TRACE_FILE)
 	@for benchmark in $(BENCHMARKS); do \
