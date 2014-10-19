@@ -5,7 +5,7 @@ CFLAGS+=-Wno-unused-parameter -Wno-unused-function
 CFLAGS+=-O2
 CFLAGS+=-g
 
-TREE_HDRS= openbsd_sys/tree.h
+TREE_HDRS= ../openbsd_sys/tree.h
 TREE_OBJS= index_splay.o index_rb.o
 INDEX_OBJS=	index_db_btree.o index_db_hash.o \
 		index_list.o index_list_front.o \

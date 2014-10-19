@@ -4,7 +4,7 @@
 
 #define T_(x,t) t ## _ ## x
 
-#include "openbsd_sys/tree.h"
+#include "../openbsd_sys/tree.h"
 
 #include <assert.h>
 #include <stddef.h>
