@@ -6,7 +6,7 @@
 
 #include "index.h"
 
-#define OHASH_INITIAL_LOG_SIZE (5)
+#define OHASH_INITIAL_LOG_SIZE (7)
 
 static void * hash_calloc(size_t, size_t, void *);
 static void * hash_malloc(size_t, void *);
