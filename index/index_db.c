@@ -6,14 +6,17 @@
 
 #include <assert.h>
 #include <db.h>
+#include <fcntl.h>
 #include <string.h>
 
 #include "index.h"
 
+#define FLAGS (O_CREAT | O_TRUNC | O_RDWR)
+
 struct index *
 index_new(void)
 {
-	return (struct index *)dbopen(NULL, 0, 0, MY_DB_TYPE, NULL);
+	return (struct index *)dbopen(NULL, FLAGS, 0, MY_DB_TYPE, NULL);
 }
 
 int
